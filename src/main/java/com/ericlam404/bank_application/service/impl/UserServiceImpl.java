@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
                 .recipient(savedUser.getEmail())
                 .subject("Account Created Successfully")
                 .messageBody("Dear " + savedUser.getFirstName() + " " + savedUser.getLastName() + ",\n\n" +
-                        ": Your account has been created successfully.\n" +
+                        "Your account has been created successfully.\n" +
                         "Account Number: " + savedUser.getAccountNumber() + "\n" +
                         "Account Balance: $" + savedUser.getAccountBalance() + "\n\n" +
                         "Thank you for choosing our bank.\n\n" +
