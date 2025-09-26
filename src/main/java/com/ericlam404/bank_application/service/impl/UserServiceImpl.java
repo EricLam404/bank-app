@@ -170,6 +170,32 @@ public class UserServiceImpl implements UserService {
         User savedFromUser = userRepository.save(fromUser);
         User savedToUser = userRepository.save(toUser);
 
+        EmailDetails debitAlert = EmailDetails.builder()
+                .recipient(savedFromUser.getEmail())
+                .subject("Debit Alert")
+                .messageBody("Dear " + savedFromUser.getFirstName() + " " + savedFromUser.getLastName() + ",\n\n" +
+                        "An amount of $" + request.getAmount() + " has been debited from your account.\n" +
+                        "Account Number: " + savedFromUser.getAccountNumber() + "\n" +
+                        "New Account Balance: $" + savedFromUser.getAccountBalance() + "\n\n" +
+                        "If you did not authorize this transaction, please contact us immediately.\n\n" +
+                        "Best regards,\n" +
+                        "Bank Team")
+                .build();
+        emailService.sendEmailAlert(debitAlert);
+
+        EmailDetails creditAlert = EmailDetails.builder()
+                .recipient(savedToUser.getEmail())
+                .subject("Credit Alert")
+                .messageBody("Dear " + savedToUser.getFirstName() + " " + savedToUser.getLastName() + ",\n\n" +
+                        "An amount of $" + request.getAmount() + " has been credited to your account.\n" +
+                        "Account Number: " + savedToUser.getAccountNumber() + "\n" +
+                        "New Account Balance: $" + savedToUser.getAccountBalance() + "\n\n" +
+                        "Thank you for banking with us.\n\n" +
+                        "Best regards,\n" +
+                        "Bank Team")
+                .build();
+        emailService.sendEmailAlert(creditAlert);
+
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_TRANSFER_SUCCESS_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_TRANSFER_SUCCESS_MESSAGE)
