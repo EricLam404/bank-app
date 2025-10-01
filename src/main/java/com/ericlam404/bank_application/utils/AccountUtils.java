@@ -27,6 +27,9 @@ public class AccountUtils {
     public static final String ACCOUNT_TRANSFER_SUCCESS_CODE = "008";
     public static final String ACCOUNT_TRANSFER_SUCCESS_MESSAGE = "Transfer completed successfully";
 
+    public static final String BANK_STATEMENT_GENERATED_CODE = "009";
+    public static final String BANK_STATEMENT_GENERATED_MESSAGE = "Bank statement generated successfully";
+
     public static String generateAccountNumber() {
         Year currentYear = Year.now();
         int min = 100000;
