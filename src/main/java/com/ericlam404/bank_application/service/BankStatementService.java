@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface BankStatementService {
 
-    public List<Transaction> generateStatement(String accountNumber, String startDate, String endDate);
+    List<Transaction> generateStatement(String accountNumber, String startDate, String endDate);
+
 }
