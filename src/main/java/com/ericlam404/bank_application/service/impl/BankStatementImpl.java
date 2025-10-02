@@ -1,10 +1,12 @@
 package com.ericlam404.bank_application.service.impl;
 
+import com.ericlam404.bank_application.dto.EmailDetails;
 import com.ericlam404.bank_application.entity.Transaction;
 import com.ericlam404.bank_application.entity.User;
 import com.ericlam404.bank_application.repository.TransactionRepository;
 import com.ericlam404.bank_application.repository.UserRepository;
 import com.ericlam404.bank_application.service.BankStatementService;
+import com.ericlam404.bank_application.service.EmailService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -23,6 +25,7 @@ import java.util.List;
 public class BankStatementImpl implements BankStatementService {
     private TransactionRepository transactionRepository;
     private UserRepository userRepository;
+    private EmailService emailService;
 
     public List<Transaction> generateStatement(String accountNumber, String startDate, String endDate) {
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
@@ -111,6 +114,14 @@ public class BankStatementImpl implements BankStatementService {
             document.add(transactionsTable);
             document.close();
             System.out.println("PDF generated successfully.");
+            EmailDetails emailDetails = EmailDetails.builder()
+                    .recipient(user.getEmail())
+                    .subject("Your Bank Statement")
+                    .messageBody("Please find attached your bank statement.")
+                    .attachment("statements/statement.pdf")
+                    .build();
+
+            emailService.sendEmailWithAttachment(emailDetails);
         } catch (java.io.FileNotFoundException | com.itextpdf.text.DocumentException e) {
             e.printStackTrace();
         }
