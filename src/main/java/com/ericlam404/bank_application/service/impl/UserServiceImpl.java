@@ -2,7 +2,6 @@ package com.ericlam404.bank_application.service.impl;
 
 import com.ericlam404.bank_application.dto.*;
 import com.ericlam404.bank_application.entity.User;
-import com.ericlam404.bank_application.repository.TransactionRepository;
 import com.ericlam404.bank_application.repository.UserRepository;
 import com.ericlam404.bank_application.service.EmailService;
 import com.ericlam404.bank_application.service.TransactionService;
