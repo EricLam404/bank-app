@@ -1,6 +1,8 @@
 package com.ericlam404.bank_application.service.impl;
 
+import com.ericlam404.bank_application.config.JwtTokenProvider;
 import com.ericlam404.bank_application.dto.*;
+import com.ericlam404.bank_application.entity.Role;
 import com.ericlam404.bank_application.entity.User;
 import com.ericlam404.bank_application.repository.UserRepository;
 import com.ericlam404.bank_application.service.EmailService;
@@ -8,6 +10,9 @@ import com.ericlam404.bank_application.service.TransactionService;
 import com.ericlam404.bank_application.service.UserService;
 import com.ericlam404.bank_application.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +31,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
@@ -51,6 +62,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(userRequest.getPhoneNumber())
                 .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                 .status("ACTIVE")
+                .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -78,6 +90,30 @@ public class UserServiceImpl implements UserService {
                         .build()
                 )
                 .build();
+    }
+
+    public BankResponse login(LoginDto loginDto){
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+
+        EmailDetails loginAlert = EmailDetails.builder()
+                .recipient(loginDto.getEmail())
+                .subject("Login Alert")
+                .messageBody("Dear User,\n\n" +
+                        "A login to your account was detected.\n" +
+                        "If this was not you, please contact us immediately.\n\n" +
+                        "Best regards,\n" +
+                        "Bank Team")
+                .build();
+        emailService.sendEmailAlert(loginAlert);
+        return BankResponse.builder()
+                .responseCode("010")
+                .responseMessage(jwtTokenProvider.generateToken(authentication))
+                .accountInfo(null)
+                .build();
+
     }
 
     @Override
